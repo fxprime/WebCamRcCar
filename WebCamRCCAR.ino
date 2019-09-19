@@ -1,21 +1,22 @@
+//WWW.arduinoNa.com
 #include "esp_camera.h"
 #include <WiFi.h>
 
-//
-// WARNING!!! Make sure that you have either selected ESP32 Wrover Module,
-//            or another board which has PSRAM enabled
-//
-// Adafruit ESP32 Feather
 
-// Select camera model
-//#define CAMERA_MODEL_WROVER_KIT
-//#define CAMERA_MODEL_M5STACK_PSRAM
-#define CAMERA_MODEL_AI_THINKER
-
+//ต่อ WiFi ไหน รหัสอะไรใส่ตรงนี้
 const char* ssid = "LaVa@TOT";
 const char* password = "0887882667";
 
+//วิธีการ Upload
+//1. ให้แน่ใจว่าเวอร์ชั่นของบอร์ด ESP32 เป็น 1.0.2 ไม่อย่างนั้นจะหา lib "esp_camera.h" ไม่เจอ
+//โดยการคลิ๊ก Tools -> Board -> Board manager พิมพ์ esp32 ในช่องค้นหา
+//เลือก esp32 version 1.0.2 แล้ว install
+//2. เลือกบอร์ดเป็น ESP32 Wrover Module (Tools->Board->ESP32 Wrover Module)
+//3. Partition scheme เลือกเป็น hugh app (Tools->Partition scheme->Hugh app)
+//4. วิธีการ Upload เข้าโหมด Flash mode โดยการต่อพิน IO0 กับ GND เข้าด้วยกัน แล้วกดปุ่ม reset จากนั้นกด Upload 
+//5. หลังอัพโหลดเสร็จ ให้เอาพิน IO0 ที่ต่อกับ GND ออก แล้วresetอีกครั้ง แล้วคลิ๊กที่ monitor ควร
 
+//Pin ต่างๆที่ใช้กับกล้อง
 #define PWDN_GPIO_NUM     32
 #define RESET_GPIO_NUM    -1
 #define XCLK_GPIO_NUM      0
@@ -35,7 +36,7 @@ const char* password = "0887882667";
 #define PCLK_GPIO_NUM     22
 
 
-// GPIO Setting
+// GPIO สำหรับมอเตอร์ 
 extern int gpLs =  16; // Left Wheel speed
 extern int gpLb =  2; // Left Wheel Back
 extern int gpLf = 14; // Left Wheel Forward
@@ -113,6 +114,7 @@ void setup() {
   sensor_t * s = esp_camera_sensor_get();
   s->set_framesize(s, FRAMESIZE_CIF);
 
+  //ต่อ WiFi 
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -122,6 +124,7 @@ void setup() {
   Serial.println("");
   Serial.println("WiFi connected");
 
+  //เปิดเซิฟเวอร์สำหรับฟีดภาพจากกล้อง
   startCameraServer();
 
   Serial.print("Camera Ready! Use 'http://");

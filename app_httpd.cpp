@@ -17,6 +17,8 @@
 #include "img_converters.h"
 #include "camera_index.h"
 #include "Arduino.h"
+
+//extern เพื่อดึงตัวแปรจากหน้า.ino มาใช้ในไฟล์นี้
 extern int gpLs;
 extern int gpLb;
 extern int gpLf;
@@ -26,6 +28,7 @@ extern int gpRf;
 extern int gpLed;
 extern String WiFiAddr;
 
+//ตัว defination อยู่ด้านล่างสุด
 void WheelAct(int nLf, int nLb, int nRf, int nRb);
 
 typedef struct {
@@ -332,12 +335,16 @@ static esp_err_t index_handler(httpd_req_t *req){
     return httpd_resp_send(req, &page[0], strlen(&page[0]));
 }
 
+//สั่งให้รถเดินหน้า
 static esp_err_t go_handler(httpd_req_t *req){
     WheelAct(HIGH, LOW, HIGH, LOW);
     Serial.println("Go");
     httpd_resp_set_type(req, "text/html");
     return httpd_resp_send(req, "OK", 2);
 }
+
+
+//สั่งให้รถถอยหลัง
 static esp_err_t back_handler(httpd_req_t *req){
     WheelAct(LOW, HIGH, LOW, HIGH);
     Serial.println("Back");
@@ -345,12 +352,15 @@ static esp_err_t back_handler(httpd_req_t *req){
     return httpd_resp_send(req, "OK", 2);
 }
 
+//สั่งให้รถหมุนทวนเข็ม
 static esp_err_t left_handler(httpd_req_t *req){
     WheelAct(HIGH, LOW, LOW, HIGH);
     Serial.println("Left");
     httpd_resp_set_type(req, "text/html");
     return httpd_resp_send(req, "OK", 2);
 }
+
+//สั่งให้รถหมุนตามเข็ม
 static esp_err_t right_handler(httpd_req_t *req){
     WheelAct(LOW, HIGH, HIGH, LOW);
     Serial.println("Right");
@@ -358,6 +368,8 @@ static esp_err_t right_handler(httpd_req_t *req){
     return httpd_resp_send(req, "OK", 2);
 }
 
+
+//สั่งให้รถหยุด
 static esp_err_t stop_handler(httpd_req_t *req){
     WheelAct(LOW, LOW, LOW, LOW);
     Serial.println("Stop");
@@ -365,12 +377,16 @@ static esp_err_t stop_handler(httpd_req_t *req){
     return httpd_resp_send(req, "OK", 2);
 }
 
+
+//สั่งให้ LED เปิด
 static esp_err_t ledon_handler(httpd_req_t *req){
     digitalWrite(gpLed, HIGH);
     Serial.println("LED ON");
     httpd_resp_set_type(req, "text/html");
     return httpd_resp_send(req, "OK", 2);
 }
+
+//สั่งให้ LED ปิด
 static esp_err_t ledoff_handler(httpd_req_t *req){
     digitalWrite(gpLed, LOW);
     Serial.println("LED OFF");
@@ -381,6 +397,7 @@ static esp_err_t ledoff_handler(httpd_req_t *req){
 void startCameraServer(){
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
+    //เพิ่มตัวจัดการฟังก์ชันสำหรับการ Request uri ต่างๆ
     httpd_uri_t go_uri = {
         .uri       = "/go",
         .method    = HTTP_GET,
@@ -487,6 +504,8 @@ void startCameraServer(){
     }
 }
 
+
+//output สำหรับสั่งมอเตอร์
 void WheelAct(int nLf, int nLb, int nRf, int nRb)
 {
 
